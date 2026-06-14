@@ -5,34 +5,34 @@ const ThemeContext = createContext()
 export const themes = {
   light: {
     bg: '#f5f5f5',
-    bgSecondary: '#ffffff',
+    bgSecondary: '#dcfce7',
     text: '#1a1a2e',
     textSecondary: '#666666',
-    primary: '#2563eb',
-    primaryHover: '#1d4ed8',
+    primary: '#22c55e',
+    primaryHover: '#16a34a',
     success: '#10b981',
     warning: '#f59e0b',
     danger: '#ef4444',
-    border: '#e5e7eb',
-    sidebar: '#1a1a2e'
+    border: '#d1fae5',
+    sidebar: '#052e16'
   },
   dark: {
     bg: '#0f0f1a',
-    bgSecondary: '#1a1a2e',
+    bgSecondary: '#14532d',
     text: '#ffffff',
     textSecondary: '#a0a0a0',
-    primary: '#3b82f6',
-    primaryHover: '#2563eb',
+    primary: '#22c55e',
+    primaryHover: '#16a34a',
     success: '#10b981',
     warning: '#f59e0b',
     danger: '#ef4444',
-    border: '#2d2d44',
-    sidebar: '#0f0f1a'
+    border: '#166534',
+    sidebar: '#052e16'
   }
 }
 
 export function ThemeProvider({ children }) {
-  const [themeMode, setThemeMode] = useState('dark')
+  const [themeMode, setThemeMode] = useState('light')
   const theme = themes[themeMode]
 
   const toggleTheme = () => {

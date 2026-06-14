@@ -13,7 +13,7 @@ export function useProducts() {
       .select(`
         *,
         categoria:categorias(id, nombre, icono)
-      `)
+      `) 
       .order('creado_en', { ascending: false })
 
     if (error) {
