@@ -7,9 +7,10 @@ import { Device } from '../../styles/breakpoints'
 
 export function Layout() {
   const { theme } = useTheme()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
-  const toggleSidebar = () => setSidebarOpen(prev => !prev)
+  const toggleSidebar = () => {  setSidebarOpen(!sidebarOpen)
+  }
 
   return (
     <Container className={sidebarOpen ? 'active' : ''}>

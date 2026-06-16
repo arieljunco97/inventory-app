@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 import { Device } from '../../styles/breakpoints'
 import { 
   FaHome, 
+  FaBox,
   FaBoxes, 
   FaTags, 
   FaExchangeAlt, 
@@ -12,7 +13,6 @@ import {
   FaSignOutAlt,
   FaSun,
   FaMoon,
-  FaWarehouse,
   FaBars,
   FaTimes
 } from 'react-icons/fa'
@@ -22,8 +22,8 @@ export function Sidebar({ isOpen, toggleSidebar }) {
   const { profile, signOut, isAdmin } = useAuth()
 
   const menuItems = [
-    { path: '/', icon: FaHome, label: 'Dashboard' },
-    { path: '/productos', icon: FaBoxes, label: 'Productos' },
+    { path: '/', icon: FaHome, label: 'Panel de Control' },
+    { path: '/productos', icon: FaBox, label: 'Productos' },
     { path: '/categorias', icon: FaTags, label: 'Categorias', adminOnly: true },
     { path: '/movimientos', icon: FaExchangeAlt, label: 'Movimientos' },
     { path: '/reportes', icon: FaChartBar, label: 'Reportes' },
@@ -44,8 +44,8 @@ export function Sidebar({ isOpen, toggleSidebar }) {
       <Container theme={theme} isOpen={isOpen}>
         <Header>
           <Logo theme={theme}>
-            <FaWarehouse />
-            <LogoText isOpen={isOpen}>StockPro</LogoText>
+            <FaBoxes />
+            <LogoText isOpen={isOpen}>Inventrack</LogoText>
           </Logo>
           <CloseButton onClick={toggleSidebar} theme={theme}>
             <FaTimes />
