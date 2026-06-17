@@ -9,11 +9,11 @@ export function useCategories() {
     const { data, error } = await supabase
       .from('categorias')
       .select('*')
-      .eq('activo', true)                          // ← solo activas
       .order('nombre')
+
     if (!error) setCategories(data)
     setLoading(false)
-}
+  }
 
   const addCategory = async (category) => {
     const { data, error } = await supabase
@@ -45,13 +45,14 @@ export function useCategories() {
   const deleteCategory = async (id) => {
     const { error } = await supabase
       .from('categorias')
-      .update({ activo: false })                   // ← soft delete
+      .delete()
       .eq('id', id)
 
-    if (error) return { error }
-    setCategories(prev => prev.filter(c => c.id !== id))
-    return { error: null }
-}
+    if (!error) {
+      setCategories(prev => prev.filter(c => c.id !== id))
+    }
+    return { error }
+  }
 
   useEffect(() => {
     fetchCategories()

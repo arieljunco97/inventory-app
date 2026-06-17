@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import styled from 'styled-components'
 import { useTheme } from '../context/ThemeContext'
-import { useProducts } from '../context/ProductsContext'
-import { useMovements } from '../context/MovementsContext'
+import { useProducts } from '../hooks/useProducts'
+import { useMovements } from '../hooks/useMovements'
 import { StatCard } from '../components/molecules/StatCard'
 import { StockAlert } from '../components/molecules/StockAlert'
 import { 

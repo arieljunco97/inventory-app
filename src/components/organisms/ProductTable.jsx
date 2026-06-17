@@ -48,7 +48,7 @@ export function ProductTable({
                 {product.codigo || '-'}
               </td>
               <td>
-                <StockBadge $low={product.stock <= product.stock_minimo}>
+                <StockBadge low={product.stock <= product.stock_minimo}>
                   {product.stock} {product.unidad}
                 </StockBadge>
               </td>
@@ -165,8 +165,8 @@ const StockBadge = styled.span`
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
-  background: ${({ $low }) => $low ? '#fef3c7' : '#d1fae5'};
-  color: ${({ $low }) => $low ? '#92400e' : '#065f46'};
+  background: ${({ low }) => low ? '#fef3c7' : '#d1fae5'};
+  color: ${({ low }) => low ? '#92400e' : '#065f46'};
 `
 
 const Actions = styled.div`

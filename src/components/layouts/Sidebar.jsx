@@ -17,7 +17,7 @@ import {
   FaTimes
 } from 'react-icons/fa'
 
-export function Sidebar({ $isOpen, toggleSidebar }) {
+export function Sidebar({ isOpen, toggleSidebar }) {
   const { theme, themeMode, toggleTheme } = useTheme()
   const { profile, signOut, isAdmin } = useAuth()
 
@@ -30,6 +30,7 @@ export function Sidebar({ $isOpen, toggleSidebar }) {
   ]
 
   const handleNavClick = () => {
+    // Cerrar sidebar en mobile al hacer click
     if (window.innerWidth < 768) {
       toggleSidebar()
     }
@@ -37,13 +38,14 @@ export function Sidebar({ $isOpen, toggleSidebar }) {
 
   return (
     <>
-      <Overlay $isOpen={$isOpen} onClick={toggleSidebar} />
+      {/* Overlay para mobile */}
+      <Overlay isOpen={isOpen} onClick={toggleSidebar} />
       
-      <Container theme={theme} $isOpen={$isOpen}>
+      <Container theme={theme} isOpen={isOpen}>
         <Header>
           <Logo theme={theme}>
             <FaBoxes />
-            <LogoText $isOpen={$isOpen}>Inventrack</LogoText>
+            <LogoText isOpen={isOpen}>Inventrack</LogoText>
           </Logo>
           <CloseButton onClick={toggleSidebar} theme={theme}>
             <FaTimes />
@@ -58,18 +60,18 @@ export function Sidebar({ $isOpen, toggleSidebar }) {
                 key={item.path} 
                 to={item.path} 
                 theme={theme}
-                $isOpen={$isOpen}
+                isOpen={isOpen}
                 onClick={handleNavClick}
               >
                 <item.icon />
-                <NavText $isOpen={$isOpen}>{item.label}</NavText>
+                <NavText isOpen={isOpen}>{item.label}</NavText>
               </NavItem>
             )
           })}
         </Nav>
 
         <Footer theme={theme}>
-          <UserInfo theme={theme} $isOpen={$isOpen}>
+          <UserInfo theme={theme} isOpen={isOpen}>
             <span>{profile?.nombre_completo || profile?.email}</span>
             <small>{profile?.rol}</small>
           </UserInfo>
@@ -88,6 +90,7 @@ export function Sidebar({ $isOpen, toggleSidebar }) {
   )
 }
 
+// Boton hamburguesa separado para usar en Layout
 export function MenuButton({ onClick, theme }) {
   return (
     <HamburgerButton onClick={onClick} theme={theme}>
@@ -97,7 +100,7 @@ export function MenuButton({ onClick, theme }) {
 }
 
 const Overlay = styled.div`
-  display: ${({ $isOpen }) => $isOpen ? 'block' : 'none'};
+  display: ${({ isOpen }) => isOpen ? 'block' : 'none'};
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
@@ -120,12 +123,14 @@ const Container = styled.aside`
   z-index: 999;
   transition: all 0.3s ease;
 
+  /* Mobile: oculto por defecto, aparece con isOpen */
   width: 260px;
-  transform: ${({ $isOpen }) => $isOpen ? 'translateX(0)' : 'translateX(-100%)'};
+  transform: ${({ isOpen }) => isOpen ? 'translateX(0)' : 'translateX(-100%)'};
 
   @media ${Device.tablet} {
+    /* Tablet+: siempre visible, ancho cambia */
     transform: translateX(0);
-    width: ${({ $isOpen }) => $isOpen ? '220px' : '65px'};
+    width: ${({ isOpen }) => isOpen ? '220px' : '65px'};
   }
 `
 
@@ -153,11 +158,11 @@ const Logo = styled.div`
 
 const LogoText = styled.span`
   white-space: nowrap;
-  opacity: ${({ $isOpen }) => $isOpen ? 1 : 0};
+  opacity: ${({ isOpen }) => isOpen ? 1 : 0};
   transition: opacity 0.2s;
 
   @media ${Device.tablet} {
-    opacity: ${({ $isOpen }) => $isOpen ? 1 : 0};
+    opacity: ${({ isOpen }) => isOpen ? 1 : 0};
   }
 `
 
@@ -232,8 +237,8 @@ const NavText = styled.span`
   opacity: 1;
 
   @media ${Device.tablet} {
-    opacity: ${({ $isOpen }) => $isOpen ? 1 : 0};
-    width: ${({ $isOpen }) => $isOpen ? 'auto' : '0'};
+    opacity: ${({ isOpen }) => isOpen ? 1 : 0};
+    width: ${({ isOpen }) => isOpen ? 'auto' : '0'};
   }
 `
 
@@ -261,7 +266,7 @@ const UserInfo = styled.div`
   }
 
   @media ${Device.tablet} {
-    display: ${({ $isOpen }) => $isOpen ? 'flex' : 'none'};
+    display: ${({ isOpen }) => isOpen ? 'flex' : 'none'};
   }
 `
 
