@@ -91,7 +91,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
               />
             </FormGroup>
 
-            <FormGroup theme={theme} $full>
+            <FormGroup theme={theme} full>
               <label>Descripcion</label>
               <textarea
                 name="descripcion"
@@ -265,7 +265,7 @@ const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  grid-column: ${({ $full }) => $full ? 'span 2' : 'auto'};
+  grid-column: ${({ full }) => full ? 'span 2' : 'auto'};
 
   @media (max-width: 500px) {
     grid-column: 1;
