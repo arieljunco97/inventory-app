@@ -6,7 +6,8 @@ import { useMovements } from '../context/MovementsContext'
 import { StatCard } from '../components/molecules/StatCard'
 import { StockAlert } from '../components/molecules/StockAlert'
 import { 
-  FaBoxes, 
+  FaBoxes,
+  FaBoxOpen, 
   FaExclamationTriangle, 
   FaArrowUp, 
   FaArrowDown,
@@ -41,16 +42,16 @@ export function Dashboard() {
   return (
     <Container>
       <Header theme={theme}>
-        <h1>Dashboard</h1>
-        <p>Resumen general del inventario</p>
+        <h1>Panel de Control</h1>
+        <p>Monitoreo y gestión del inventario en tiempo real</p>
       </Header>
 
       <StatsGrid>
         <StatCard 
-          icon={FaBoxes} 
+          icon={FaBoxOpen} 
           label="Total Productos" 
           value={stats.totalProducts}
-          color="#3b82f6"
+          color="#10b981"
         />
         <StatCard 
           icon={FaExclamationTriangle} 
@@ -62,13 +63,13 @@ export function Dashboard() {
           icon={FaArrowUp} 
           label="Entradas Hoy" 
           value={stats.todayEntries}
-          color="#10b981"
+          color="#16a34a"
         />
         <StatCard 
           icon={FaArrowDown} 
           label="Salidas Hoy" 
           value={stats.todayExits}
-          color="#ef4444"
+          color="#dc2626"
         />
       </StatsGrid>
 

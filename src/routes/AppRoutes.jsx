@@ -11,7 +11,7 @@ import { Reports } from '../pages/Reports'
 
 export function AppRoutes() {
   const { user, loading } = useAuth()
-
+  
   if (loading) {
     return <div style={{ 
       display: 'flex', 
@@ -21,7 +21,7 @@ export function AppRoutes() {
       color: '#fff',
       background: '#0f0f1a'
     }}>Cargando...</div>
-  }
+   }
 
   return (
     <Routes>
