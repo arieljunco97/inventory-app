@@ -43,7 +43,7 @@ export function Sidebar({ $isOpen, toggleSidebar }) {
         <Header>
           <Logo theme={theme}>
             <FaBoxes />
-            <LogoText $isOpen={$isOpen}>Inventrack</LogoText>
+            <LogoText isOpen={isOpen}>Inventrack</LogoText>
           </Logo>
           <CloseButton onClick={toggleSidebar} theme={theme}>
             <FaTimes />

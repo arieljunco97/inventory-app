@@ -2,7 +2,7 @@ import { useState } from 'react'
 import styled from 'styled-components'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { FaWarehouse, FaEnvelope, FaLock, FaUser } from 'react-icons/fa'
+import { FaBoxes, FaEnvelope, FaLock, FaUser } from 'react-icons/fa'
 
 export function Login() {
   const [isLogin, setIsLogin] = useState(true)
@@ -34,8 +34,8 @@ export function Login() {
     <Container theme={theme}>
       <Card theme={theme}>
         <Logo theme={theme}>
-          <FaWarehouse />
-          <span>StockPro</span>
+          <FaBoxes />
+          <span>Inventrack</span>
         </Logo>
         
         <Title theme={theme}>
