@@ -14,9 +14,9 @@ export function Layout() {
 
   return (
     <Container className={sidebarOpen ? 'active' : ''}>
-      <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      <Sidebar $isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       
-      <Main theme={theme} isOpen={sidebarOpen}>
+      <Main theme={theme} $isOpen={sidebarOpen}>
         <TopBar theme={theme}>
           <MenuButton onClick={toggleSidebar} theme={theme} />
         </TopBar>

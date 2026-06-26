@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 import { useTheme } from '../context/ThemeContext'
-import { useProducts } from '../hooks/useProducts'
+import { useProducts } from '../context/ProductsContext'
 import { useCategories } from '../hooks/useCategories'
-import { useMovements } from '../hooks/useMovements'
+import { useMovements } from '../context/MovementsContext'
 import { SearchBar } from '../components/molecules/SearchBar'
 import { ProductTable } from '../components/organisms/ProductTable'
 import { ProductForm } from '../components/organisms/ProductForm'
@@ -54,18 +54,29 @@ export function Products() {
   }
 
   const handleFormSubmit = async (data) => {
+    let result
     if (editingProduct) {
-      await updateProduct(editingProduct.id, data)
+      result = await updateProduct(editingProduct.id, data)
     } else {
-      await addProduct(data)
+      result = await addProduct(data)
     }
+
+    if (result.error) {
+      alert('Error al guardar: ' + result.error.message)
+      return  // NO cerrar el modal si falló
+    }
+
     setShowForm(false)
     setEditingProduct(null)
-  }
+}
 
   const handleMovementSubmit = async (e) => {
     e.preventDefault()
-    await addMovement(selectedProduct.id, movementType, parseInt(movementQty), movementNotes)
+    const result = await addMovement(selectedProduct.id, movementType, parseInt(movementQty), movementNotes)
+    if (result?.error) {
+      alert('Error al registrar movimiento: ' + result.error.message)
+      return
+    }
     setShowMovementModal(false)
   }
 
