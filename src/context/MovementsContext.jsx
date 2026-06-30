@@ -23,9 +23,9 @@ export function MovementsProvider({ children }) {
     setLoading(false)
   }
 
-  const addMovement = async (productoId, tipo, cantidad, notas = '') => {
-    const { data: producto } = await supabase
-      .from('productos')
+
+    const addMovement = async (productoId, tipo, cantidad, motivo = 'Venta', notas = '') => {
+      const { data: producto } = await supabase      .from('productos')
       .select('stock')
       .eq('id', productoId)
       .single()
@@ -42,15 +42,16 @@ export function MovementsProvider({ children }) {
     }
 
     const { data: movimiento, error: movError } = await supabase
-      .from('movimientos')
-      .insert([{
-        producto_id: productoId,
-        usuario_id: user?.id,   // ← el ?. evita crash si user es null
-        tipo,
-        cantidad,
-        stock_anterior: stockAnterior,
-        stock_nuevo: stockNuevo,
-        notas
+        .from('movimientos')
+        .insert([{
+          producto_id: productoId,
+          usuario_id: user?.id ?? null,
+          tipo,
+          cantidad,
+          stock_anterior: stockAnterior,
+          stock_nuevo: stockNuevo,
+          motivo,
+          notas
       }])
       .select(`
         *,

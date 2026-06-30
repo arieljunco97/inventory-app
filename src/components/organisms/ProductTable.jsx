@@ -7,7 +7,9 @@ export function ProductTable({
   products, 
   onEdit, 
   onDelete, 
-  onMovement 
+  onMovement,
+  selectedIds,
+  onToggleSelect 
 }) {
   const { theme } = useTheme()
 
@@ -24,6 +26,7 @@ export function ProductTable({
       <Table theme={theme}>
         <thead>
           <tr>
+            <th></th>
             <th>Producto</th>
             <th className="hide-mobile">Categoria</th>
             <th className="hide-mobile">Codigo</th>
@@ -36,7 +39,14 @@ export function ProductTable({
           {products.map(product => (
             <tr key={product.id}>
               <td>
-                <ProductName>
+                <Checkbox
+                  type="checkbox"
+                  checked={selectedIds.includes(product.id)}
+                  onChange={() => onToggleSelect(product.id)}
+                />
+              </td>
+              <td>
+                <ProductName theme={theme}>
                   <strong>{product.nombre}</strong>
                   <small>{product.descripcion}</small>
                 </ProductName>
@@ -113,11 +123,15 @@ const Table = styled.table`
   }
 
   th {
-    background: ${({ theme }) => theme.bg};
+    background: ${({ theme }) => theme.bgSecondary};
     color: ${({ theme }) => theme.textSecondary};
     font-weight: 600;
     font-size: 0.875rem;
     white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.8rem;
+    border-bottom: 1px solid ${({ theme }) => theme.border};
   }
 
   td {
@@ -148,7 +162,7 @@ const ProductName = styled.div`
     white-space: nowrap;
   }
   small { 
-    color: #888; 
+    color: ${({ theme }) => theme.textSecondary}; 
     font-size: 0.8rem;
     display: block;
     max-width: 200px;
@@ -199,4 +213,10 @@ const EmptyState = styled.p`
   padding: 3rem;
   background: ${({ theme }) => theme.bgSecondary};
   border-radius: 0.75rem;
+`
+const Checkbox = styled.input`
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: ${({ theme }) => theme?.primary || '#3b82f6'};
 `

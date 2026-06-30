@@ -78,7 +78,7 @@ export function Categories() {
               <IconBox theme={theme}>
                 <IconComponent />
               </IconBox>
-              <Info>
+              <Info theme={theme}>
                 <h3>{cat.nombre}</h3>
                 <p>{cat.descripcion || 'Sin descripcion'}</p>
               </Info>
@@ -180,13 +180,13 @@ const Info = styled.div`
   min-width: 0;
   
   h3 {
-    color: #fff;
+    color: ${({ theme }) => theme.text};
     font-size: 1rem;
     margin-bottom: 0.25rem;
   }
   
   p {
-    color: #888;
+    color: ${({ theme }) => theme.textSecondary};
     font-size: 0.8rem;
     overflow: hidden;
     text-overflow: ellipsis;

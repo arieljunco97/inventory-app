@@ -26,6 +26,14 @@ export function Products() {
   const [movementType, setMovementType] = useState('entrada')
   const [movementQty, setMovementQty] = useState(1)
   const [movementNotes, setMovementNotes] = useState('')
+  const [movementMotivo, setMovementMotivo] = useState('Venta')
+  const [selectedIds, setSelectedIds] = useState([])
+  const [showBulkModal, setShowBulkModal] = useState(false)
+  const [bulkQuantities, setBulkQuantities] = useState({})
+  const [bulkMotivo, setBulkMotivo] = useState('Venta')
+  const [bulkNotes, setBulkNotes] = useState('')
+  const [bulkSubmitting, setBulkSubmitting] = useState(false)
+
 
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.nombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -46,12 +54,59 @@ export function Products() {
   }
 
   const handleMovement = (product, type) => {
-    setSelectedProduct(product)
-    setMovementType(type)
-    setMovementQty(1)
-    setMovementNotes('')
-    setShowMovementModal(true)
+  setSelectedProduct(product)
+  setMovementType(type)
+  setMovementQty(1)
+  setMovementMotivo(type === 'entrada' ? 'Compra a proveedor' : 'Venta')
+  setMovementNotes('')
+  setShowMovementModal(true)
   }
+
+  const handleToggleSelect = (id) => {
+  setSelectedIds(prev => 
+    prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+  )
+  }
+
+  const handleClearSelection = () => {
+    setSelectedIds([])
+  }
+
+  const handleOpenBulkModal = () => {
+    // Precarga cantidad 1 para cada producto seleccionado
+    const initialQuantities = {}
+    selectedIds.forEach(id => { initialQuantities[id] = 1 })
+    setBulkQuantities(initialQuantities)
+    setBulkMotivo('Venta')
+    setBulkNotes('')
+    setShowBulkModal(true)
+  }
+
+  const handleBulkQuantityChange = (id, value) => {
+    setBulkQuantities(prev => ({ ...prev, [id]: value }))
+  }
+
+  const selectedProductsForBulk = products.filter(p => selectedIds.includes(p.id))
+
+  const handleBulkSubmit = async (e) => {
+    e.preventDefault()
+    setBulkSubmitting(true)
+
+    for (const product of selectedProductsForBulk) {
+      const qty = parseInt(bulkQuantities[product.id]) || 1
+      const result = await addMovement(product.id, 'salida', qty, bulkMotivo, bulkNotes)
+      if (result?.error) {
+        alert(`Error al registrar movimiento de "${product.nombre}": ${result.error.message}`)
+        setBulkSubmitting(false)
+        return
+      }
+    }
+
+    setBulkSubmitting(false)
+    setShowBulkModal(false)
+    setSelectedIds([])
+  }
+
 
   const handleFormSubmit = async (data) => {
     let result
@@ -72,7 +127,7 @@ export function Products() {
 
   const handleMovementSubmit = async (e) => {
     e.preventDefault()
-    const result = await addMovement(selectedProduct.id, movementType, parseInt(movementQty), movementNotes)
+    const result = await addMovement(selectedProduct.id, movementType, parseInt(movementQty), movementMotivo, movementNotes)
     if (result?.error) {
       alert('Error al registrar movimiento: ' + result.error.message)
       return
@@ -112,11 +167,27 @@ export function Products() {
         </Select>
       </Filters>
 
+      {selectedIds.length > 0 && (
+        <SelectionBar theme={theme}>
+          <span>{selectedIds.length} producto{selectedIds.length > 1 ? 's' : ''} seleccionado{selectedIds.length > 1 ? 's' : ''}</span>
+          <SelectionActions>
+            <BulkButton onClick={handleOpenBulkModal} theme={theme}>
+              Registrar salida en lote
+            </BulkButton>
+            <CancelSelectionBtn onClick={handleClearSelection} theme={theme}>
+              Cancelar
+            </CancelSelectionBtn>
+          </SelectionActions>
+        </SelectionBar>
+      )}
+
       <ProductTable 
         products={filteredProducts}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onMovement={handleMovement}
+        selectedIds={selectedIds}
+        onToggleSelect={handleToggleSelect}
       />
 
       {showForm && (
@@ -133,7 +204,7 @@ export function Products() {
           <Modal theme={theme} onClick={e => e.stopPropagation()}>
             <ModalHeader theme={theme}>
               <h2>{movementType === 'entrada' ? 'Entrada' : 'Salida'} de Stock</h2>
-              <CloseBtn onClick={() => setShowMovementModal(false)}><FaTimes /></CloseBtn>
+              <CloseBtn onClick={() => setShowMovementModal(false)} theme={theme}><FaTimes /></CloseBtn>
             </ModalHeader>
             <Form onSubmit={handleMovementSubmit}>
               <Info theme={theme}>
@@ -153,6 +224,20 @@ export function Products() {
                 />
               </FormGroup>
               <FormGroup theme={theme}>
+                <label>Motivo</label>
+                <select
+                  value={movementMotivo}
+                  onChange={(e) => setMovementMotivo(e.target.value)}
+                >
+                  <option value="Venta">Venta</option>
+                  <option value="Compra a proveedor">Compra a proveedor</option>
+                  <option value="Vencimiento">Vencimiento</option>
+                  <option value="Rotura">Rotura</option>
+                  <option value="Conteo fisico">Conteo físico</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </FormGroup>
+              <FormGroup theme={theme}>
                 <label>Notas (opcional)</label>
                 <textarea
                   value={movementNotes}
@@ -165,7 +250,7 @@ export function Products() {
                 <CancelBtn type="button" onClick={() => setShowMovementModal(false)} theme={theme}>
                   Cancelar
                 </CancelBtn>
-                <ConfirmBtn type="submit" movementType={movementType}>
+                <ConfirmBtn type="submit" $movementType={movementType}>
                   Confirmar {movementType === 'entrada' ? 'Entrada' : 'Salida'}
                 </ConfirmBtn>
               </ModalFooter>
@@ -173,9 +258,76 @@ export function Products() {
           </Modal>
         </ModalOverlay>
       )}
+
+      {showBulkModal && (
+        <ModalOverlay onClick={() => setShowBulkModal(false)}>
+          <BulkModal theme={theme} onClick={e => e.stopPropagation()}>
+            <ModalHeader theme={theme}>
+              <h2>Registrar salida — {selectedProductsForBulk.length} productos</h2>
+              <CloseBtn onClick={() => setShowBulkModal(false)} theme={theme}><FaTimes /></CloseBtn>
+            </ModalHeader>
+            <Form onSubmit={handleBulkSubmit}>
+              <BulkProductList>
+                {selectedProductsForBulk.map(product => (
+                  <BulkProductRow key={product.id} theme={theme}>
+                    <BulkProductName theme={theme}>
+                      {product.nombre}
+                      <small>Stock actual: {product.stock} {product.unidad}</small>
+                    </BulkProductName>
+                    <input
+                      type="number"
+                      min="1"
+                      max={product.stock}
+                      value={bulkQuantities[product.id] || 1}
+                      onChange={(e) => handleBulkQuantityChange(product.id, e.target.value)}
+                      required
+                    />
+                  </BulkProductRow>
+                ))}
+              </BulkProductList>
+
+              <FormGroup theme={theme}>
+                <label>Motivo</label>
+                <select
+                  value={bulkMotivo}
+                  onChange={(e) => setBulkMotivo(e.target.value)}
+                >
+                  <option value="Venta">Venta</option>
+                  <option value="Compra a proveedor">Compra a proveedor</option>
+                  <option value="Vencimiento">Vencimiento</option>
+                  <option value="Rotura">Rotura</option>
+                  <option value="Conteo fisico">Conteo físico</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </FormGroup>
+
+              <FormGroup theme={theme}>
+                <label>Notas (opcional, se aplica a todos)</label>
+                <textarea
+                  value={bulkNotes}
+                  onChange={(e) => setBulkNotes(e.target.value)}
+                  rows={2}
+                  placeholder="Ej: Lote de mayo, deposito 2"
+                />
+              </FormGroup>
+
+              <ModalFooter theme={theme}>
+                <CancelBtn type="button" onClick={() => setShowBulkModal(false)} theme={theme}>
+                  Cancelar
+                </CancelBtn>
+                <SubmitBulkBtn type="submit" disabled={bulkSubmitting}>
+                  {bulkSubmitting ? 'Guardando...' : 'Confirmar salida en lote'}
+                </SubmitBulkBtn>
+              </ModalFooter>
+            </Form>
+          </BulkModal>
+        </ModalOverlay>
+      )}
+
     </Container>
   )
 }
+
 
 const Container = styled.div`
   display: flex;
@@ -226,6 +378,17 @@ const Select = styled.select`
   border: 1px solid ${({ theme }) => theme.border};
   outline: none;
   min-width: 180px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: ${({ theme }) => theme.primary};
+  }
+
+  option {
+    background: ${({ theme }) => theme.bgSecondary};
+    color: ${({ theme }) => theme.text};
+  }
 `
 
 const ModalOverlay = styled.div`
@@ -261,11 +424,11 @@ const ModalHeader = styled.div`
 
 const CloseBtn = styled.button`
   background: none;
-  color: #888;
+  color: ${({ theme }) => theme.textSecondary};
   font-size: 1.25rem;
   display: flex;
   
-  &:hover { color: #fff; }
+  &:hover { color: ${({ theme }) => theme.text}; }
 `
 
 const Form = styled.form`
@@ -322,7 +485,7 @@ const CancelBtn = styled.button`
 `
 
 const ConfirmBtn = styled.button`
-  background: ${({ movementType }) => movementType === 'entrada' ? '#10b981' : '#ef4444'};
+  background: ${({ $movementType }) => $movementType === 'entrada' ? '#10b981' : '#ef4444'};
   color: white;
   padding: 0.75rem 1.25rem;
   border-radius: 0.5rem;
@@ -331,4 +494,111 @@ const ConfirmBtn = styled.button`
   &:hover {
     opacity: 0.9;
   }
+`
+
+const SelectionBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: ${({ theme }) => theme.bgSecondary};
+  border: 1px solid ${({ theme }) => theme.primary};
+  border-radius: 0.5rem;
+  padding: 0.875rem 1.25rem;
+
+  span {
+    color: ${({ theme }) => theme.text};
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+`
+
+const SelectionActions = styled.div`
+  display: flex;
+  gap: 0.75rem;
+`
+
+const BulkButton = styled.button`
+  background: ${({ theme }) => theme.primary};
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+
+  &:hover { background: ${({ theme }) => theme.primaryHover}; }
+`
+
+const CancelSelectionBtn = styled.button`
+  background: ${({ theme }) => theme.bg};
+  color: ${({ theme }) => theme.text};
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid ${({ theme }) => theme.border};
+  font-size: 0.875rem;
+
+  &:hover { background: ${({ theme }) => theme.border}; }
+`
+
+const BulkModal = styled.div`
+  background: ${({ theme }) => theme.bgSecondary};
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+`
+
+const BulkProductList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  max-height: 240px;
+  overflow-y: auto;
+`
+
+const BulkProductRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.625rem 0.75rem;
+  background: ${({ theme }) => theme.bg};
+  border-radius: 0.5rem;
+
+  input {
+    width: 80px;
+    background: ${({ theme }) => theme.bgSecondary};
+    color: ${({ theme }) => theme.text};
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid ${({ theme }) => theme.border};
+    outline: none;
+    text-align: center;
+  }
+`
+
+const BulkProductName = styled.div`
+  display: flex;
+  flex-direction: column;
+  color: ${({ theme }) => theme.text};
+  font-size: 0.9rem;
+
+  small {
+    color: ${({ theme }) => theme.textSecondary};
+    font-size: 0.75rem;
+  }
+`
+
+const SubmitBulkBtn = styled.button`
+  background: #ef4444;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+
+  &:hover:not(:disabled) { opacity: 0.9; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
 `
