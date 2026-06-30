@@ -179,7 +179,7 @@ export function ProductForm({ product, onSubmit, onClose }) {
               />
             </FormGroup>
 
-            <FormGroup theme={theme} full>
+            <FormGroup theme={theme} $full>
               <label>Ubicacion</label>
               <input
                 type="text"

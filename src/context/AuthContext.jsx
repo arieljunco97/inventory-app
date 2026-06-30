@@ -8,41 +8,64 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
 
+    const fetchProfile = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('perfiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (!error && data) {
+        setProfile(data)
+      } else {
+        setProfile(null)
+      }
+    } catch {
+      setProfile(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
+    let mounted = true
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
+      if (!mounted) return
       if (session?.user) {
+        setUser(session.user)
         fetchProfile(session.user.id)
       } else {
+        setUser(null)
+        setProfile(null)
         setLoading(false)
       }
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setUser(session?.user ?? null)
+        if (!mounted) return
+        if (event === 'INITIAL_SESSION') return
+
         if (session?.user) {
+          setUser(session.user)
           await fetchProfile(session.user.id)
         } else {
+          setUser(null)
           setProfile(null)
+          setLoading(false)
         }
-        setLoading(false)
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
-  const fetchProfile = async (userId) => {
-    const { data, error } = await supabase
-      .from('perfiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    
-    if (!error) setProfile(data)
-    setLoading(false)
-  }
+
 
   const signIn = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -52,15 +75,20 @@ export function AuthProvider({ children }) {
     return { data, error }
   }
 
-  const signUp = async (email, password, nombreCompleto) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: nombreCompleto }
+  const createUser = async (email, password, nombreCompleto, rol = 'empleado') => {
+    const { data: { session } } = await supabase.auth.getSession()
+
+    const { data, error } = await supabase.functions.invoke('create-user', {
+      body: { email, password, nombre_completo: nombreCompleto, rol },
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`
       }
     })
-    return { data, error }
+
+    if (error) return { data: null, error }
+    if (data?.error) return { data: null, error: { message: data.error } }
+
+    return { data: data.data, error: null }
   }
 
   const signOut = async () => {
@@ -77,7 +105,7 @@ export function AuthProvider({ children }) {
       profile,
       loading,
       signIn,
-      signUp,
+      createUser,
       signOut,
       isAdmin
     }}>

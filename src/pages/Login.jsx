@@ -2,17 +2,17 @@ import { useState } from 'react'
 import styled from 'styled-components'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { FaBoxes, FaEnvelope, FaLock, FaUser } from 'react-icons/fa'
+import { FaBoxes, FaEnvelope, FaLock} from 'react-icons/fa'
 
 export function Login() {
-  const [isLogin, setIsLogin] = useState(true)
+  
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [fullName, setFullName] = useState('')
+
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   
-  const { signIn, signUp } = useAuth()
+  const { signIn} = useAuth()
   const { theme } = useTheme()
 
   const handleSubmit = async (e) => {
@@ -20,9 +20,7 @@ export function Login() {
     setError('')
     setLoading(true)
 
-    const { error } = isLogin 
-      ? await signIn(email, password)
-      : await signUp(email, password, fullName)
+    const { error } = await signIn(email, password)
 
     if (error) {
       setError(error.message)
@@ -38,23 +36,10 @@ export function Login() {
           <span>Inventrack</span>
         </Logo>
         
-        <Title theme={theme}>
-          {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
-        </Title>
+        <Title theme={theme}>Iniciar Sesión</Title>
 
         <Form onSubmit={handleSubmit}>
-          {!isLogin && (
-            <InputGroup theme={theme}>
-              <FaUser />
-              <input
-                type="text"
-                placeholder="Nombre completo"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required={!isLogin}
-              />
-            </InputGroup>
-          )}
+          
 
           <InputGroup theme={theme}>
             <FaEnvelope />
@@ -81,16 +66,13 @@ export function Login() {
           {error && <Error>{error}</Error>}
 
           <Button type="submit" disabled={loading} theme={theme}>
-            {loading ? 'Cargando...' : isLogin ? 'Entrar' : 'Registrarse'}
+            {loading ? 'Cargando...' : 'Entrar'}
           </Button>
         </Form>
+        <Hint theme={theme}>
+          Para acceder al sistema necesitás que un administrador te cree una cuenta.
+        </Hint>
 
-        <Toggle theme={theme}>
-          {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
-          <button onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? 'Regístrate' : 'Inicia sesión'}
-          </button>
-        </Toggle>
       </Card>
     </Container>
   )
@@ -190,20 +172,10 @@ const Error = styled.p`
   text-align: center;
 `
 
-const Toggle = styled.p`
+const Hint = styled.p`
   color: ${({ theme }) => theme.textSecondary};
   text-align: center;
   margin-top: 1.5rem;
-  font-size: 0.875rem;
-
-  button {
-    background: none;
-    color: ${({ theme }) => theme.primary};
-    font-weight: 600;
-    margin-left: 0.25rem;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+  font-size: 0.8rem;
+  line-height: 1.4;
 `

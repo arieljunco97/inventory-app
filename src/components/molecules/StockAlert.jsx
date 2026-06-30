@@ -18,7 +18,7 @@ export function StockAlert({ products = [] }) {
     <Container>
       {products.map(product => (
         <AlertItem key={product.id} theme={theme}>
-          <Info>
+          <Info theme={theme}>
             <strong>{product.nombre}</strong>
             <small>{product.categoria?.nombre || 'Sin categoria'}</small>
           </Info>
@@ -52,12 +52,12 @@ const Info = styled.div`
   flex-direction: column;
 
   strong {
-    color: #fff;
+    color: ${({ theme }) => theme.text};
     font-size: 0.9rem;
   }
 
   small {
-    color: #888;
+    color: ${({ theme }) => theme.textSecondary};
     font-size: 0.75rem;
   }
 `

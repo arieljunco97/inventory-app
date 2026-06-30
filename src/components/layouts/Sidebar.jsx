@@ -10,6 +10,7 @@ import {
   FaTags, 
   FaExchangeAlt, 
   FaChartBar,
+  FaUsers,
   FaSignOutAlt,
   FaSun,
   FaMoon,
@@ -22,11 +23,12 @@ export function Sidebar({ $isOpen, toggleSidebar }) {
   const { profile, signOut, isAdmin } = useAuth()
 
   const menuItems = [
-    { path: '/', icon: FaHome, label: 'Panel de Control' },
+    { path: '/', icon: FaHome, label: 'Panel' },
     { path: '/productos', icon: FaBox, label: 'Productos' },
     { path: '/categorias', icon: FaTags, label: 'Categorias', adminOnly: true },
     { path: '/movimientos', icon: FaExchangeAlt, label: 'Movimientos' },
     { path: '/reportes', icon: FaChartBar, label: 'Reportes' },
+    { path: '/usuarios',    icon: FaUsers,       label: 'Usuarios',   adminOnly: true },
   ]
 
   const handleNavClick = () => {
@@ -40,10 +42,10 @@ export function Sidebar({ $isOpen, toggleSidebar }) {
       <Overlay $isOpen={$isOpen} onClick={toggleSidebar} />
       
       <Container theme={theme} $isOpen={$isOpen}>
-        <Header>
-          <Logo theme={theme}>
+        <Header $isOpen={$isOpen}>
+          <Logo $isOpen={$isOpen} theme={theme}>
             <FaBoxes />
-            <LogoText isOpen={isOpen}>Inventrack</LogoText>
+            <LogoText $isOpen={$isOpen}>Inventrack</LogoText>
           </Logo>
           <CloseButton onClick={toggleSidebar} theme={theme}>
             <FaTimes />
@@ -60,8 +62,11 @@ export function Sidebar({ $isOpen, toggleSidebar }) {
                 theme={theme}
                 $isOpen={$isOpen}
                 onClick={handleNavClick}
+                end={item.path === '/'}
               >
-                <item.icon />
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', flexShrink: 0 }}>
+                  <item.icon />
+                </span>
                 <NavText $isOpen={$isOpen}>{item.label}</NavText>
               </NavItem>
             )
@@ -74,7 +79,7 @@ export function Sidebar({ $isOpen, toggleSidebar }) {
             <small>{profile?.rol}</small>
           </UserInfo>
 
-          <FooterButtons>
+          <FooterButtons $isOpen={$isOpen}>
             <IconButton onClick={toggleTheme} theme={theme} title="Cambiar tema">
               {themeMode === 'dark' ? <FaSun /> : <FaMoon />}
             </IconButton>
@@ -116,7 +121,7 @@ const Container = styled.aside`
   background: ${({ theme }) => theme.sidebar};
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1.25rem 0.75rem;
   z-index: 999;
   transition: all 0.3s ease;
 
@@ -126,6 +131,8 @@ const Container = styled.aside`
   @media ${Device.tablet} {
     transform: translateX(0);
     width: ${({ $isOpen }) => $isOpen ? '220px' : '65px'};
+    padding: ${({ $isOpen }) => $isOpen ? '1.5rem' : '1.5rem 0'};
+    align-items: ${({ $isOpen }) => $isOpen ? 'stretch' : 'center'};
   }
 `
 
@@ -134,6 +141,12 @@ const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2rem;
+
+  @media ${Device.tablet} {
+    ${({ $isOpen }) => !$isOpen && `
+      justify-content: center;
+    `}
+  }
 `
 
 const Logo = styled.div`
@@ -149,15 +162,22 @@ const Logo = styled.div`
     font-size: 1.75rem;
     flex-shrink: 0;
   }
+
+  @media ${Device.tablet} {
+    ${({ $isOpen }) => !$isOpen && `
+      gap: 0;
+    `}
+  }
 `
 
 const LogoText = styled.span`
   white-space: nowrap;
-  opacity: ${({ $isOpen }) => $isOpen ? 1 : 0};
-  transition: opacity 0.2s;
+  overflow: hidden;
 
   @media ${Device.tablet} {
+    display: ${({ $isOpen }) => $isOpen ? 'inline' : 'none'};
     opacity: ${({ $isOpen }) => $isOpen ? 1 : 0};
+    transition: opacity 0.15s;
   }
 `
 
@@ -199,6 +219,8 @@ const Nav = styled.nav`
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
+  overflow: hidden;
+  width: 100%;
 `
 
 const NavItem = styled(NavLink)`
@@ -210,6 +232,9 @@ const NavItem = styled(NavLink)`
   color: ${({ theme }) => theme.textSecondary};
   transition: all 0.2s;
   overflow: hidden;
+  text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
 
   &:hover {
     background: ${({ theme }) => theme.border};
@@ -225,15 +250,26 @@ const NavItem = styled(NavLink)`
     font-size: 1.25rem;
     flex-shrink: 0;
   }
+
+  @media ${Device.tablet} {
+    ${({ $isOpen }) => !$isOpen && `
+      justify-content: center;
+      padding: 0.875rem 0;
+      gap: 0;
+    `}
+  }
 `
 
 const NavText = styled.span`
   white-space: nowrap;
+  overflow: hidden;
   opacity: 1;
+  min-width: 0;
 
   @media ${Device.tablet} {
+    display: ${({ $isOpen }) => $isOpen ? 'inline' : 'none'};
     opacity: ${({ $isOpen }) => $isOpen ? 1 : 0};
-    width: ${({ $isOpen }) => $isOpen ? 'auto' : '0'};
+    transition: opacity 0.15s;
   }
 `
 
@@ -268,6 +304,17 @@ const UserInfo = styled.div`
 const FooterButtons = styled.div`
   display: flex;
   gap: 0.5rem;
+  flex-direction: row;
+  align-items: center;
+
+  @media ${Device.tablet} {
+    ${({ $isOpen }) => !$isOpen && `
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    `}
+  }
 `
 
 const IconButton = styled.button`

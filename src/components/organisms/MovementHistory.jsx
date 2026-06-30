@@ -24,7 +24,6 @@ export function MovementHistory({ movements = [] }) {
             <th>Cantidad</th>
             <th className="hide-mobile">Anterior</th>
             <th className="hide-mobile">Nuevo</th>
-            <th className="hide-tablet">Usuario</th>
             <th className="hide-tablet">Notas</th>
           </tr>
         </thead>
@@ -39,19 +38,17 @@ export function MovementHistory({ movements = [] }) {
               </td>
               <td>{mov.producto?.nombre || '-'}</td>
               <td>
-                <TypeBadge type={mov.tipo}>{mov.tipo}</TypeBadge>
+                <TypeBadge $type={mov.tipo}>{mov.tipo}</TypeBadge>
               </td>
               <td>
-                <QuantityBadge type={mov.tipo}>
+                <QuantityBadge $type={mov.tipo}>
                   {mov.tipo === 'entrada' ? '+' : mov.tipo === 'salida' ? '-' : ''}
                   {mov.cantidad}
                 </QuantityBadge>
               </td>
               <td className="hide-mobile">{mov.stock_anterior}</td>
               <td className="hide-mobile">{mov.stock_nuevo}</td>
-              <td className="hide-tablet">
-                {mov.perfil?.nombre_completo || mov.perfil?.email || '-'}
-              </td>
+              
               <td className="hide-tablet">{mov.notas || '-'}</td>
             </tr>
           ))}
@@ -79,7 +76,7 @@ const Table = styled.table`
   }
 
   th {
-    background: ${({ theme }) => theme.bg};
+    background: ${({ theme }) => theme.bgSecondary};
     color: ${({ theme }) => theme.textSecondary};
     font-size: 0.8rem;
     font-weight: 600;
@@ -123,19 +120,19 @@ const TypeBadge = styled.span`
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: capitalize;
-  background: ${({ type }) => 
-    type === 'entrada' ? '#d1fae5' : 
-    type === 'salida' ? '#fee2e2' : '#fef3c7'};
-  color: ${({ type }) => 
-    type === 'entrada' ? '#065f46' : 
-    type === 'salida' ? '#991b1b' : '#92400e'};
+  background: ${({ $type }) => 
+    $type === 'entrada' ? '#d1fae5' : 
+    $type === 'salida' ? '#fee2e2' : '#fef3c7'};
+  color: ${({ $type }) => 
+    $type === 'entrada' ? '#065f46' : 
+    $type === 'salida' ? '#991b1b' : '#92400e'};
 `
 
 const QuantityBadge = styled.span`
   font-weight: 600;
-  color: ${({ type }) => 
-    type === 'entrada' ? '#10b981' : 
-    type === 'salida' ? '#ef4444' : '#f59e0b'};
+  color: ${({ $type }) => 
+    $type === 'entrada' ? '#10b981' : 
+    $type === 'salida' ? '#ef4444' : '#f59e0b'};
 `
 
 const EmptyState = styled.p`

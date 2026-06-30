@@ -95,7 +95,7 @@ export function Dashboard() {
                     <strong>{mov.producto?.nombre}</strong>
                     <small>{new Date(mov.creado_en).toLocaleDateString()}</small>
                   </div>
-                  <MovementBadge type={mov.tipo}>
+                  <MovementBadge $type={mov.tipo}>
                     {mov.tipo === 'entrada' ? '+' : '-'}{mov.cantidad}
                   </MovementBadge>
                 </ListItem>
@@ -180,8 +180,8 @@ const ListItem = styled.div`
 `
 
 const MovementBadge = styled.span`
-  background: ${({ type }) => type === 'entrada' ? '#d1fae5' : '#fee2e2'};
-  color: ${({ type }) => type === 'entrada' ? '#065f46' : '#991b1b'};
+  background: ${({ $type }) => $type === 'entrada' ? '#d1fae5' : '#fee2e2'};
+  color: ${({ $type }) => $type === 'entrada' ? '#065f46' : '#991b1b'};
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
   font-size: 0.75rem;
